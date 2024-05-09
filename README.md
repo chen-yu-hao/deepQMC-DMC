@@ -66,3 +66,21 @@ from deepqmc_dmc import train
 
 train(H, ansatz, 'kfac', sampler, steps=10000, electron_batch_size=2000, seed=42)
 ```
+## Start DMC calculation
+Import packages
+```python
+from deepqmc_dmc.ml_wf import *
+from deepqmc_dmc.dmc import *
+```
+Define the machine learning wave function class and initialise it with the molecular structure, wave function, Hamiltonian, and random number seeds.
+```python
+wf=ml_wf(mol,ansatz,H,43)
+```
+Load neural network parameters from last checkpoint.
+```python
+wf.load_deepqmc_model('chkpt-150000.pt')
+```
+Start DMC calculation.
+```python
+dmc_run(dmc_cfg,wf)
+```
