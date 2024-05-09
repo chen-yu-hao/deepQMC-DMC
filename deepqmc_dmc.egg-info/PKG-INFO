@@ -3,8 +3,17 @@ Name: deepqmc-dmc
 Version: 0.1
 Author: Yuhao Chen
 Author-email: chenyuhao@shu.edu.cn
+Requires-Dist: dm-haiku>0.0.9
 Requires-Dist: h5py
-Requires-Dist: jax
-Requires-Dist: jaxlib
+Requires-Dist: hydra-core
+Requires-Dist: jax<0.4.24
+Requires-Dist: jaxlib<0.4.24
+Requires-Dist: jax-dataclasses
 Requires-Dist: kfac_jax@ git+https://github.com/deepmind/kfac-jax
 Requires-Dist: ml-collections
+Requires-Dist: pyscf
+Requires-Dist: tensorboard
+Requires-Dist: pyyaml
+Requires-Dist: tqdm
+Requires-Dist: uncertainties
+Requires-Dist: scipy<1.13.0

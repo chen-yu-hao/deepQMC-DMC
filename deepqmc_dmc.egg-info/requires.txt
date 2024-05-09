@@ -1,5 +1,14 @@
+dm-haiku>0.0.9
 h5py
-jax
-jaxlib
+hydra-core
+jax<0.4.24
+jaxlib<0.4.24
+jax-dataclasses
 kfac_jax@ git+https://github.com/deepmind/kfac-jax
 ml-collections
+pyscf
+tensorboard
+pyyaml
+tqdm
+uncertainties
+scipy<1.13.0
