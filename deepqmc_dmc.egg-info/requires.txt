@@ -1,0 +1,5 @@
+h5py
+jax
+jaxlib
+kfac_jax@ git+https://github.com/deepmind/kfac-jax
+ml-collections

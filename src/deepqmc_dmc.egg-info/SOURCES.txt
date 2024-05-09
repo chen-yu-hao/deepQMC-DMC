@@ -1,0 +1,6 @@
+setup.py
+src/deepqmc_dmc/__init__.py
+src/deepqmc_dmc.egg-info/PKG-INFO
+src/deepqmc_dmc.egg-info/SOURCES.txt
+src/deepqmc_dmc.egg-info/dependency_links.txt
+src/deepqmc_dmc.egg-info/top_level.txt
