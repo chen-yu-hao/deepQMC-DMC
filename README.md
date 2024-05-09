@@ -13,7 +13,7 @@ You need to install jaqmc before using deepQMC-DMC. (https://github.com/bytedanc
 ### Create a molecule
 A Molecule can be also created from scratch by specifying the nuclear coordinates and charges, as well as the total charge and spin multiplicity:
 
-```shell
+```python
 mol = Molecule(  # LiH
     coords=[[0.0, 0.0, 0.0], [3.015, 0.0, 0.0]],
     charges=[3, 1],
@@ -24,8 +24,8 @@ mol = Molecule(  # LiH
 ```
 ### Create the molecular Hamiltonian
 From the molecule the MolecularHamiltonian is constructed:
-```shell
+```python
 from deepqmc import MolecularHamiltonian
 
 H = MolecularHamiltonian(mol=mol)
-```shell
+```
