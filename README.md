@@ -7,9 +7,10 @@ deepQMC-DMC can be installed via the supplied setup.py file.
 ```shell
 pip3 install -e .
 ```
-You need to install jaqmc before using deepQMC-DMC. (https://github.com/bytedance/jaqmc)
+You need to install [jaqmc](https://github.com/bytedance/jaqmc) before using deepQMC-DMC. 
 
 ## Train VMC wave function 
+cite from [deepQMC](https://deepqmc.github.io/tutorial.html)
 ### Create a molecule
 A Molecule can be also created from scratch by specifying the nuclear coordinates and charges, as well as the total charge and spin multiplicity:
 
@@ -53,4 +54,15 @@ _ansatz = instantiate(cfg, _recursive_=True, _convert_='all')
 
 ansatz = instantiate_ansatz(H, _ansatz)
 ```
+### Instantiate a sampler
+```python
+from deepqmc_dmc.sampling import chain, MetropolisSampler, DecorrSampler
 
+sampler = chain(DecorrSampler(length=20),MetropolisSampler(H))
+```
+### Optimize the ansatz
+```python
+from deepqmc_dmc import train
+
+train(H, ansatz, 'kfac', sampler, steps=10000, electron_batch_size=2000, seed=42)
+```
