@@ -49,7 +49,7 @@ def dmc_run(dmc_cfg,wf):
     position_shape=wf.r[0,0].shape
     position = wf.r[0,0].reshape(position_shape[0],position_shape[1]*position_shape[2])
     # dmc_cfg=deepqmc_psi.
-    key = jax.random.PRNGKey(int(time.time()))
+    key = wf.rng
     run(
         position,
         dmc_cfg.iterations,
