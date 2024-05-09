@@ -3,3 +3,8 @@ Name: deepqmc-dmc
 Version: 0.1
 Author: Yuhao Chen
 Author-email: chenyuhao@shu.edu.cn
+Requires-Dist: h5py
+Requires-Dist: jax
+Requires-Dist: jaxlib
+Requires-Dist: kfac_jax@ git+https://github.com/deepmind/kfac-jax
+Requires-Dist: ml-collections

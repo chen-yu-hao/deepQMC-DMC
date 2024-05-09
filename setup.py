@@ -3,12 +3,21 @@ import unittest
 
 from setuptools import find_packages
 REQUIRED_PACKAGES = [
+    'dm-haiku>0.0.9',
     'h5py',
-    'jax',
-    'jaxlib',
+    'hydra-core',
+    'jax<0.4.24',
+    'jaxlib<0.4.24',
+    'jax-dataclasses',
     # TODO(b/230487443) - use released version of kfac.
     'kfac_jax @ git+https://github.com/deepmind/kfac-jax',
     'ml-collections',
+    'pyscf',
+    # 'tensorboard',
+    'tensorboard',
+    'pyyaml',
+    'tqdm',
+    'uncertainties',
 ]
 
 setup(

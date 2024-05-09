@@ -1,0 +1,24 @@
+defaults:
+  - _self_
+  - optional .@_here_: deepqmc
+  - task: train
+  - ansatz: paulinet
+  - hamil: qc
+  - override hydra/job_logging: custom
+  - override hydra/launcher: slurm
+hydra:
+  job:
+    name: deepqmc
+    chdir: true
+  searchpath:
+    - file://conf
+  output_subdir: ${get_hydra_subdir:}
+  sweep:
+    subdir: ${hydra.job.override_dirname}
+task:
+  workdir: ???
+device: cuda
+logging:
+  deepqmc: 20
+  jax: 40
+  kfac: 40

@@ -1,0 +1,3 @@
+_target_: deepqmc.app.train_from_checkpoint
+evaluate: true
+restdir: ???

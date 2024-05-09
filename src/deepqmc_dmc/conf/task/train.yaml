@@ -1,0 +1,26 @@
+defaults:
+  - sampler: decorr_metropolis
+  - opt: kfac
+_target_: deepqmc.app.train_from_factories
+hamil: ${hamil}
+ansatz: ${ansatz}
+steps: 1000
+molecule_batch_size: 1
+electron_batch_size: 1000
+seed: 0
+pretrain_steps: 5000
+pretrain_kwargs:
+  opt: adam
+  opt_kwargs:
+    learning_rate: 3.e-4
+    b1: 0.9
+    b2: 0.999
+  baseline_kwargs:
+    basis: sto-6g
+metric_logger:
+  _target_: deepqmc.log.TensorboardMetricLogger
+  _partial_: true
+  period: 10
+mols:
+  _target_: deepqmc.app.read_molecules
+  directory: null

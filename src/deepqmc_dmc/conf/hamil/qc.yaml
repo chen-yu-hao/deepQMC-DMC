@@ -1,0 +1,5 @@
+defaults:
+  - mol: LiH
+_target_: deepqmc.hamil.MolecularHamiltonian
+mol:
+  _target_: deepqmc.molecule.Molecule
