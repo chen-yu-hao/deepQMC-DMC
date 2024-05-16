@@ -29,11 +29,12 @@ def fit_wf(
     electron_batch_size,
     steps,
     train_state,
+    batch_size,
     *,
     clip_mask_fn=None,
 ):
     device_count = jax.device_count()
-    loss_fn = create_energy_loss_fn(hamil, ansatz, clip_mask_fn)
+    loss_fn = create_energy_loss_fn(hamil, ansatz, clip_mask_fn,batch_size)
     opt = optimizer_factory(loss_fn)
 
     @pmap
