@@ -3,7 +3,7 @@ import jax.numpy as jnp
 
 from .types import Potential
 from .utils import norm, triu_flat
-
+import folx
 __all__ = ()
 
 
@@ -57,12 +57,17 @@ class NuclearCoulombPotential(Potential):
 
 def laplacian(f):
     def lap(x):
-        n_coord = len(x)
-        grad_f = jax.grad(f)
-        df, grad_f_jvp = jax.linearize(grad_f, x)
-        eye = jnp.eye(n_coord)
-        d2f = lambda i, val: val + grad_f_jvp(eye[i])[i]
-        d2f_sum = jax.lax.fori_loop(0, n_coord, d2f, 0.0)
-        return d2f_sum, df
+        # lap_f=folx.forward_laplacian(f)
+        lap_f=folx.ForwardLaplacianOperator(6)(f)
+        lap_results=lap_f(x)
+        # print(lap_results)
+        return lap_results[0], lap_results[1]
+        # n_coord = len(x)
+        # grad_f = jax.grad(f)
+        # df, grad_f_jvp = jax.linearize(grad_f, x)
+        # eye = jnp.eye(n_coord)
+        # d2f = lambda i, val: val + grad_f_jvp(eye[i])[i]
+        # d2f_sum = jax.lax.fori_loop(0, n_coord, d2f, 0.0)
+        # return d2f_sum, df
 
     return lap
