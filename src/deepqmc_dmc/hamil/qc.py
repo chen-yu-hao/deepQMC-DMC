@@ -207,14 +207,15 @@ class MolecularHamiltonian(Hamiltonian):
             Vs_loc = self.potential.local_potential(phys_conf)
             Vs_nl = self.potential.nonloc_potential(rng, phys_conf, wf)
             Es_loc = Es_kin + Vs_loc + Vs_nl + Vs_el + Es_nuc
-            stats = {
-                'hamil/V_el': Vs_el,
-                'hamil/E_kin': Es_kin,
-                'hamil/V_loc': Vs_loc,
-                'hamil/V_nl': Vs_nl,
-                'hamil/lap': lap_log_psis,
-                'hamil/quantum_force': (quantum_force**2).sum(axis=-1),
-            }
+            # stats = {
+            #     'hamil/V_el': Vs_el,
+            #     'hamil/E_kin': Es_kin,
+            #     'hamil/V_loc': Vs_loc,
+            #     'hamil/V_nl': Vs_nl,
+            #     'hamil/lap': lap_log_psis,
+            #     'hamil/quantum_force': (quantum_force**2).sum(axis=-1),
+            # }
+            stats=jnp.array([Vs_el,Es_kin,Vs_loc,Vs_nl,lap_log_psis,(quantum_force**2).sum(axis=-1)])
 
             result = (Es_loc, quantum_force) if return_grad else Es_loc
             return result, stats
