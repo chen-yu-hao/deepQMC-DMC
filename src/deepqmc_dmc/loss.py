@@ -6,16 +6,30 @@ import kfac_jax
 from deepqmc.clip import median_log_squeeze_and_mask
 from deepqmc.parallel import all_device_mean
 from deepqmc.utils import masked_mean
+import jax.numpy as jnp
+from jax.lax import fori_loop
+from jaxite.jaxite_lib import jax_helpers
+# from folx import batched_vmap
 
 __all__ = ()
 
-
-def compute_local_energy(rng, hamil, ansatz, params, phys_conf):
+def compute_local_energy(rng, hamil, ansatz, params, phys_conf,batch_size):
     rng = jax.random.split(rng, len(phys_conf))
     rng = jax.vmap(partial(jax.random.split, num=phys_conf.batch_shape[1]))(rng)
-    local_energy, hamil_stats = jax.vmap(
-        jax.vmap(hamil.local_energy(partial(ansatz.apply, params)))
-    )(rng, phys_conf)
+    
+    func_vmap=hamil.local_energy(partial(ansatz.apply, params))
+    local_energy,hamil_stats=jax.vmap(jax_helpers.batch_vmap(func_vmap, batch_size=batch_size))(rng,phys_conf)
+    local_energy,hamil_stats=jax.vmap(jax_helpers.batch_vmap(func_vmap, batch_size=batch_size))(rng,phys_conf)
+    # print(local_energy)
+    hamil_stats = {
+                'hamil/V_el': hamil_stats [:,:,0],
+                'hamil/E_kin': hamil_stats[:,:,1],
+                'hamil/V_loc': hamil_stats[:,:,2],
+                'hamil/V_nl': hamil_stats [:,:,3],
+                'hamil/lap': hamil_stats  [:,:,4],
+                'hamil/quantum_force': hamil_stats[:,:,5],
+            }
+
     stats = {
         'E_loc/mean': local_energy.mean(axis=1),
         'E_loc/std': local_energy.std(axis=1),
@@ -56,13 +70,20 @@ def compute_mean_energy_tangent(local_energy, weight, log_psi_tangent, gradient_
     return mean_energy_tangent
 
 
-def create_energy_loss_fn(hamil, ansatz, clip_mask_fn):
+def create_energy_loss_fn(hamil, ansatz, clip_mask_fn,batch_size):
     @jax.custom_jvp
     def loss_fn(params, rng, batch):
         phys_conf, weight = batch
         local_energy, stats = compute_local_energy(
-            rng, hamil, ansatz, params, phys_conf
+            rng, hamil, ansatz, params, phys_conf,batch_size
         )
+        # rng,rng1=jnp.random.split(rng,1)
+        # local_energy_batch, stats = compute_local_energy(
+        #     rng, hamil, ansatz, params, phys_conf[:,500:1000]
+        # )
+        # local_energy = jnp.concatenate((local_energy, local_energy_batch),axis=1)
+        # local_energy = jnp.concatenate((local_energy, local_energy_batch),axis=1)
+        # local_energy = jnp.concatenate((local_energy, local_energy_batch),axis=1)
         loss = compute_mean_energy(local_energy, weight)
         return loss, (local_energy, stats)
 
@@ -72,7 +93,7 @@ def create_energy_loss_fn(hamil, ansatz, clip_mask_fn):
         params_tangent, *_ = tangents
 
         local_energy, stats = compute_local_energy(
-            rng, hamil, ansatz, params, phys_conf
+            rng, hamil, ansatz, params, phys_conf,batch_size
         )
 
         loss = compute_mean_energy(local_energy, weight)
