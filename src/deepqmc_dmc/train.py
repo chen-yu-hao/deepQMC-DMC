@@ -64,6 +64,7 @@ def train(  # noqa: C901
     chkptdir=None,
     chkpts_kwargs=None,
     metric_logger=None,
+    batch_size=500
 ):
     r"""Train or evaluate a JAX wave function model.
 
@@ -265,6 +266,7 @@ def train(  # noqa: C901
                     electron_batch_size,
                     pbar,
                     train_state,
+                    batch_size,
                     **(fit_kwargs or {}),
                 ):
                     per_mol_energy = E_loc.mean(axis=1)
