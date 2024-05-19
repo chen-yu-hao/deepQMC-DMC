@@ -3,8 +3,8 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 
-from deepqmc.loss import create_energy_loss_fn
-from deepqmc.optimizer import NoOptimizer
+from .loss import create_energy_loss_fn
+from .optimizer import NoOptimizer
 
 from .parallel import (
     gather_electrons_on_one_device,
