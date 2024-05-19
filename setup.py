@@ -20,7 +20,7 @@ REQUIRED_PACKAGES = [
     'uncertainties',
     'scipy<1.13.0', 
     "folx",
-    "jaxite",
+    "jaxite @ git+https://github.com/google/jaxite",
 ]
 
 setup(
