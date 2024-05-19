@@ -19,8 +19,8 @@ REQUIRED_PACKAGES = [
     'tqdm',
     'uncertainties',
     'scipy<1.13.0', 
-    folx,
-    jaxite,
+    "folx",
+    "jaxite",
 ]
 
 setup(
