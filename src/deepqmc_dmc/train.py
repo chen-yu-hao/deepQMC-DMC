@@ -9,7 +9,7 @@ import jax.numpy as jnp
 from tqdm.auto import tqdm, trange
 from uncertainties import ufloat
 
-from deepqmc.optimizer import construct_optimizer
+from .optimizer import construct_optimizer
 
 from .ewm import init_ewm
 from .fit import fit_wf
