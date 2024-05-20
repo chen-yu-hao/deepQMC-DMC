@@ -11,7 +11,7 @@ dmc_cfg = ml_collections.ConfigDict({
           'energy_offset_update_amplitude':1,
           'print_info_interval': 20,
           'weight_branch_threshold': (0.3, 2),
-          'energy_window_size': 1000,
+          'energy_window_size': 10000,
           'mixed_estimator_num_steps': 5000,
           'energy_outlier_rel_threshold': -1.0,
           'energy_cutoff_alpha': 0.2,
