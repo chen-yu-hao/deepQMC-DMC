@@ -19,7 +19,7 @@ def compute_local_energy(rng, hamil, ansatz, params, phys_conf,batch_size):
     
     func_vmap=hamil.local_energy(partial(ansatz.apply, params))
     local_energy,hamil_stats=jax.vmap(jax_helpers.batch_vmap(func_vmap, batch_size=batch_size))(rng,phys_conf)
-    local_energy,hamil_stats=jax.vmap(jax_helpers.batch_vmap(func_vmap, batch_size=batch_size))(rng,phys_conf)
+    # local_energy,hamil_stats=jax.vmap(jax_helpers.batch_vmap(func_vmap, batch_size=batch_size))(rng,phys_conf)
     # print(local_energy)
     hamil_stats = {
                 'hamil/V_el': hamil_stats [:,:,0],
