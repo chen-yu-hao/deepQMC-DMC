@@ -46,8 +46,18 @@ dmc_cfg = ml_collections.ConfigDict({
   )
 
 def dmc_run(dmc_cfg,wf):
-    position_shape=wf.r[0,0].shape
-    position = wf.r[0,0].reshape(position_shape[0],position_shape[1]*position_shape[2])
+    if wf.r.shape[0]==1:
+        position_shape=wf.r[0,0].shape
+        position = wf.r[0,0].reshape(position_shape[0],position_shape[1]*position_shape[2])
+    else:
+        position_shape=wf.r[0,0].shape
+        position = jnp.concatenate([i[0] for i in wf.r],axis=0).reshape(position_shape[0]*wf.r.shape[0],position_shape[1]*position_shape[2])
+    # print(position.shape)
+    # position_shape=wf.r[0,0].shape
+    # position = wf.r[0,0].reshape(position_shape[0],position_shape[1]*position_shape[2])
+    # dmc_cfg=deepqmc_psi.
+    # position_shape=wf.r[0,0].shape
+    # position = wf.r[0,0].reshape(position_shape[0],position_shape[1]*position_shape[2])
     # dmc_cfg=deepqmc_psi.
     key = wf.rng
     run(
