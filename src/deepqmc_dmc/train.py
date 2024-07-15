@@ -269,6 +269,7 @@ def train(  # noqa: C901
                     batch_size,
                     **(fit_kwargs or {}),
                 ):
+                    print(stats["loss"],stats["loss_spin_plus"])
                     per_mol_energy = E_loc.mean(axis=1)
                     ewm_energies = []
                     for energy, mol_idx in zip(per_mol_energy, mol_idxs):
