@@ -9,6 +9,7 @@ from deepqmc.utils import masked_mean
 import jax.numpy as jnp
 from jax.lax import fori_loop
 from jaxite.jaxite_lib import jax_helpers
+from .ml_wf import *
 # from folx import batched_vmap
 
 __all__ = ()
@@ -19,7 +20,7 @@ def compute_local_energy(rng, hamil, ansatz, params, phys_conf,batch_size):
     
     func_vmap=hamil.local_energy(partial(ansatz.apply, params))
     local_energy,hamil_stats=jax.vmap(jax_helpers.batch_vmap(func_vmap, batch_size=batch_size))(rng,phys_conf)
-    # local_energy,hamil_stats=jax.vmap(jax_helpers.batch_vmap(func_vmap, batch_size=batch_size))(rng,phys_conf)
+    local_energy,hamil_stats=jax.vmap(jax_helpers.batch_vmap(func_vmap, batch_size=batch_size))(rng,phys_conf)
     # print(local_energy)
     hamil_stats = {
                 'hamil/V_el': hamil_stats [:,:,0],
@@ -43,6 +44,32 @@ def compute_local_energy(rng, hamil, ansatz, params, phys_conf,batch_size):
 def clip_local_energy(clip_mask_fn, local_energy):
     return jax.vmap(clip_mask_fn)(local_energy)
 
+def compute_spin_plus(ansatz, phys_conf, params):
+
+    flat_phys_conf = phys_conf
+    print(flat_phys_conf.r)
+    print(flat_phys_conf.R)
+    vspsi=jax.vmap(partial(ansatz.apply, params))
+
+    sign0,psi0=vspsi(flat_phys_conf)
+    S2_local=jnp.zeros_like(psi0)
+
+    n_up=4
+
+    for i in range(n_up):
+        # for j in range(n_down):
+        flat_phys_conf1=flat_phys_conf
+        flat_phys_conf1.r=flat_phys_conf1.r.at[:,i,:].set(flat_phys_conf.r[:,n_up,:])
+        flat_phys_conf1.r=flat_phys_conf1.r.at[:,n_up,:].set(flat_phys_conf.r[:,i,:])
+        sign1,psi1=vspsi(flat_phys_conf1)
+        S2_local=S2_local+sign0*sign1*jnp.exp(psi1-psi0)
+    return S2_local
+
+def compute_spin_plus_tangent(ansatz, phys_conf, params, params_tangent):
+    def compute_spin(params):
+        return compute_spin_plus(ansatz, phys_conf,params)
+    spin_plus,spin_plus_tangent = jax.jvp(compute_spin, (params,), (params_tangent,))
+    return spin_plus,spin_plus_tangent
 
 def compute_log_psi_tangent(ansatz, phys_conf, params, params_tangent):
     flat_phys_conf = jax.tree_util.tree_map(
@@ -85,7 +112,15 @@ def create_energy_loss_fn(hamil, ansatz, clip_mask_fn,batch_size):
         # local_energy = jnp.concatenate((local_energy, local_energy_batch),axis=1)
         # local_energy = jnp.concatenate((local_energy, local_energy_batch),axis=1)
         loss = compute_mean_energy(local_energy, weight)
-        return loss, (local_energy, stats)
+        ################# for spin plus ###########################
+        spin_plus= compute_spin_plus(ansatz, phys_conf,params)
+        loss_spin_plus = compute_mean_energy(spin_plus, weight)
+        stats["loss_spin_plus"] = loss_spin_plus
+        stats["loss"] = loss
+        ###########################################################
+
+        return loss+loss_spin_plus*10, (local_energy, stats)
+        # return loss, (local_energy, stats)
 
     @loss_fn.defjvp
     def loss_fn_jvp(primals, tangents):
@@ -108,8 +143,19 @@ def create_energy_loss_fn(hamil, ansatz, clip_mask_fn,batch_size):
             clipped_local_energy, weight, log_psi_tangent, gradient_mask
         )
 
+        ##################### spin plus #################################
+        spin_plus,spin_plus_tangent=compute_spin_plus_tangent(ansatz, phys_conf, params, params_tangent)
+        loss_spin_plus = compute_mean_energy(spin_plus, weight)
+        loss_spin_plus_tangent = 2 * loss_spin_plus * compute_mean_energy(2*(spin_plus-loss_spin_plus)*log_psi_tangent+spin_plus_tangent, weight)
+
+
+        #################################################################
+
         aux = (local_energy, stats)
-        return (loss, aux), (loss_tangent, aux)
+        return (loss+10*loss_spin_plus**2, aux), (loss_tangent+10*loss_spin_plus_tangent, aux)
+        # return (loss, aux), (loss_tangent, aux)
+
+
         # jax.custom_jvp has actually no official support for auxiliary output.
         # the second aux in the tangent output should be in fact aux_tangent.
         # we just output the same thing to satisfy jax's API requirement with
